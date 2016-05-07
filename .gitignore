@@ -30,3 +30,14 @@
 
 # Debug files
 *.dSYM/
+
+# Visual Studio
+DataSet/
+*.VC.opendb
+*.sdf
+Debug/
+*.obj
+*.idb
+*.pdb
+*.log
+*.tlog/
