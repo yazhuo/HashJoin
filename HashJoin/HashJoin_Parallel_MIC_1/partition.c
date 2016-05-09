@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <omp.h>
 
 void hash_partition(int *ary, int size, int *keyzonenum, int *hisgram)
 {
@@ -19,6 +20,7 @@ void init(int *keyzonenum, int size, int *ary)
 		keyzonenum[i] = ary[i] % ZONENUM;
 }
 
+// ø…“‘”√pthread
 void scan1(int *keyzonenum, int *hisgram, int size)
 {
 	int i;

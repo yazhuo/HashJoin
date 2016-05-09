@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <omp.h>
 
 void hash_partition(int *ary, int size, int *keyzonenum, int *hisgram)
 {
@@ -15,6 +16,7 @@ void hash_partition(int *ary, int size, int *keyzonenum, int *hisgram)
 void init(int *keyzonenum, int size, int *ary)
 {
 	int i;
+#pragma omp parallel for num_threads(4)
 	for (i = 0; i < size; ++i)
 		keyzonenum[i] = ary[i] % ZONENUM;
 }
@@ -22,6 +24,7 @@ void init(int *keyzonenum, int size, int *ary)
 void scan1(int *keyzonenum, int *hisgram, int size)
 {
 	int i;
+
 	for (i = 0; i < size; ++i)
 		hisgram[keyzonenum[i]]++;
 }

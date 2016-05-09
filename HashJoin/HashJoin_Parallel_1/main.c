@@ -1,3 +1,6 @@
+/*
+ 使用pthread进行多线程处理（未加锁处理冲突）
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -15,18 +18,27 @@ int main(int argc, char **argv)
 	clock_t t1, t2;
 	int i;
 
-	int pkeylen = datalen[0];
-	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
-	assert(pkeydata != NULL);
+	int pkeydata[] = { 1,2,3,4,5,6,7,8,9,10,
+	11,12,13,14,15,16,17,18,19,20 };
+	int pkeylen = sizeof(pkeydata)/sizeof(int);
+	int fkeydata[] = { 1,2,3,4,5,6,7,8,9,10,
+		1,2,3,4,5,6,7,8,9,10,
+		11,12,13,14,15,16,17,18,19,20,
+		11,12,13,14,15,16,17,18,19,20 };
+	int fkeylen = sizeof(fkeydata) / sizeof(int);
 
-	int fkeylen = datalen[1];
-	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
-	assert(fkeydata != NULL);
+	//int pkeylen = datalen[0];
+	//int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
+	//assert(pkeydata != NULL);
 
-	/* load DataKey and DataUniform data */
-	loaddata(filenames, 0, pkeylen, pkeydata);
-	loaddata(filenames, 0, fkeylen, fkeydata);
-	printf("pkeylen = %d pkeydata[0] = %d \n", pkeylen, pkeydata[0]);
+	//int fkeylen = datalen[3];
+	//int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
+	//assert(fkeydata != NULL);
+
+	///* load DataKey and DataUniform data */
+	//loaddata(filenames, 0, pkeylen, pkeydata);
+	//loaddata(filenames, 3, fkeylen, fkeydata);
+	//printf("pkeylen = %d pkeydata[0] = %d \n", pkeylen, pkeydata[0]);
 
 	int *p_keyzonenum = (int*)malloc(sizeof(int) * pkeylen);
 	assert(p_keyzonenum);
@@ -65,6 +77,18 @@ int main(int argc, char **argv)
 	t2 = clock();
 	printf("build hashtable time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
+	int j;
+	printf("hashtable: \n");
+	for (i = 0; i < ZONENUM; i++)
+	{
+		printf("hashtable[%d]:\n", i);
+		for (j = 0; j < TABLESIZE; j++)
+		{
+			printf("%d ", hashtable[i][j]);
+		}
+		printf("\n");
+	}
+
 	printf("begin probe...\n");
 	t1 = clock();
 	probe_with_zone(hashtable, fkeydata, f_hisgram);
@@ -77,10 +101,9 @@ int main(int argc, char **argv)
 	free(p_hisgram);
 	free(f_keyzonenum);
 	free(f_hisgram);
-	free(pkeydata);
-	free(fkeydata);
+//	free(pkeydata);
+//	free(fkeydata);
 
 	printf("ending...\n");
-	system("pause");
 	return 0;
 }

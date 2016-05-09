@@ -5,10 +5,8 @@
 extern char filenames[][NAMEMAX];
 extern int datalen[];
 
-//#define TABLESIZE 87719
-//#define ZONENUM 256
-#define TABLESIZE 11
-#define ZONENUM 4
+#define TABLESIZE 87719
+#define ZONENUM 256
 
 typedef struct
 {

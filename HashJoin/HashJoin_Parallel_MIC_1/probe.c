@@ -8,8 +8,8 @@
 void * probe_process_thread(void *p)
 {
 	thread_param_t data = *(thread_param_t *)p;
-	int j;
-	for (j = data.begin; j < data.end; j++)
+
+	for (int j = data.begin; j < data.end; j++)
 		probe_process(data.zone_id, j, data.keydata, data.hashtable, data.status_hashtable);
 
 	pthread_exit(NULL);

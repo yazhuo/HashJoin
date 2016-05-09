@@ -1,3 +1,6 @@
+/*
+使用openmp进行多线程处理
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -7,9 +10,9 @@
 #include "loader.h"
 #include "partition.h"
 #include "build.h"
-#include "probe.h"
+//#include "probe.h"
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	printf("running...\n");
 	clock_t t1, t2;
@@ -18,13 +21,13 @@ int main(int argc, char **argv)
 	int pkeylen = datalen[0];
 	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	assert(pkeydata != NULL);
-	int fkeylen = datalen[3];
+
+	int fkeylen = datalen[1];
 	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
-	assert(pkeydata);
+	assert(fkeydata != NULL);
 
 	loaddata(filenames, 0, pkeylen, pkeydata);
-	loaddata(filenames, 3, fkeylen, fkeydata);
-	printf("pkeylen = %d pkeydata[0] = %d \n", pkeylen, pkeydata[0]);
+	loaddata(filenames, 1, fkeylen, fkeydata);
 
 	int *p_keyzonenum = (int*)malloc(sizeof(int) * pkeylen);
 	assert(p_keyzonenum);
@@ -61,12 +64,6 @@ int main(int argc, char **argv)
 	buildhash_with_zone(pkeydata, hashtable, p_hisgram);
 	t2 = clock();
 	printf("build hashtable time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
-
-	printf("begin probe...\n");
-	t1 = clock();
-	probe_with_zone(hashtable, fkeydata, f_hisgram);
-	t2 = clock();
-	printf("probe time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
 	for (i = 0; i < ZONENUM; i++)
 		free(hashtable[i]);

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+//#include <sys/time.h>
 #include <string.h>
 #include <assert.h>
 #include "global.h"
@@ -17,12 +18,12 @@ int main(int argc, char **argv)
 	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	assert(pkeydata);
 
-	int fkeylen = datalen[1];
+	int fkeylen = datalen[3];
 	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
 	assert(pkeydata);
 
 	loaddata(filenames, 0, pkeylen, pkeydata);
-	loaddata(filenames, 0, fkeylen, fkeydata);
+	loaddata(filenames, 3, fkeylen, fkeydata);
 
 	int *hashtable = (int*)malloc(sizeof(int) * TABLESIZE);
 	memset(hashtable, 0, sizeof(int) * TABLESIZE);

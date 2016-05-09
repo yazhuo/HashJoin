@@ -18,12 +18,14 @@ int main(int argc, char **argv)
 	int pkeylen = datalen[0];
 	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	assert(pkeydata != NULL);
-	int fkeylen = datalen[3];
-	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
-	assert(pkeydata);
 
+	int fkeylen = datalen[1];
+	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
+	assert(fkeydata != NULL);
+
+	/* load DataKey and DataUniform data */
 	loaddata(filenames, 0, pkeylen, pkeydata);
-	loaddata(filenames, 3, fkeylen, fkeydata);
+	loaddata(filenames, 0, fkeylen, fkeydata);
 	printf("pkeylen = %d pkeydata[0] = %d \n", pkeylen, pkeydata[0]);
 
 	int *p_keyzonenum = (int*)malloc(sizeof(int) * pkeylen);
@@ -48,6 +50,7 @@ int main(int argc, char **argv)
 	t2 = clock();
 	printf("foreign data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
+	/* malloc for build process */
 	int *hashtable[ZONENUM];
 	for (i = 0; i < ZONENUM; i++)
 	{
@@ -78,5 +81,6 @@ int main(int argc, char **argv)
 	free(fkeydata);
 
 	printf("ending...\n");
+	system("pause");
 	return 0;
 }
