@@ -12,18 +12,19 @@
 int main(int argc, char **argv)
 {
 	printf("begining...\n");
-	clock_t t1, t2;
+	clock_t t1, t2, begin, end;
 
+	begin = clock();
 	int pkeylen = datalen[0];
 	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	assert(pkeydata);
 
-	int fkeylen = datalen[3];
+	int fkeylen = datalen[1];
 	int *fkeydata = (int*)malloc(sizeof(int) * fkeylen);
 	assert(pkeydata);
 
 	loaddata(filenames, 0, pkeylen, pkeydata);
-	loaddata(filenames, 3, fkeylen, fkeydata);
+	loaddata(filenames, 1, fkeylen, fkeydata);
 
 	int *hashtable = (int*)malloc(sizeof(int) * TABLESIZE);
 	memset(hashtable, 0, sizeof(int) * TABLESIZE);
@@ -40,6 +41,9 @@ int main(int argc, char **argv)
 	probe(hashtable, fkeydata, fkeylen);
 	t2 = clock();
 	printf("probing time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
+
+	end = clock();
+	printf("total time = %f\n", (double)(end - begin) / CLOCKS_PER_SEC);
 
 	free(hashtable);
 	free(fkeydata);

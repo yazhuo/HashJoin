@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{72AB8DDF-12C6-4BD1-883C-0AFB3347CFA7}</ProjectGuid>
+    <ProjectGuid>{E96F397D-FEA5-4BB3-890A-BB974FA6EF4C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>HashJoin_Parallel_1</RootNamespace>
+    <RootNamespace>HashJoin_Parallel_3</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,7 +83,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\yazoo\Downloads\pthreads-w32-2-9-1-release\Pre-built.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,7 +105,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_TIMESPEC_DEFINED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_TIMESPEC_DEFINED;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_TIMESPEC_DEFINED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_TIMESPEC_DEFINED;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -152,21 +152,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="build.h" />
-    <ClInclude Include="global.h" />
-    <ClInclude Include="loader.h" />
-    <ClInclude Include="parallel_partition.h" />
-    <ClInclude Include="partition.h" />
-    <ClInclude Include="probe.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="build.c" />
     <ClCompile Include="global.c" />
     <ClCompile Include="loader.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="parallel_partition.c" />
     <ClCompile Include="partition.c" />
     <ClCompile Include="probe.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="build.h" />
+    <ClInclude Include="global.h" />
+    <ClInclude Include="loader.h" />
+    <ClInclude Include="partition.h" />
+    <ClInclude Include="probe.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

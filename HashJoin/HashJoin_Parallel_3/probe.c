@@ -1,53 +1,42 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <pthread.h>
+#include "probe.h"
 #include <assert.h>
-#include "build.h"
 
-int hash1(int key)
-{
-	return key % TABLESIZE;
-}
-
-int hash2(int key)
-{
-	return (1 + (key % (TABLESIZE - 1)));
-}
-
-int doublehash(int key, int offset)
-{
-	return (hash1(key) + offset * hash2(key)) % TABLESIZE;
-}
-
-void build_process(int hb_param, int pk_param, int *pkeydata, int *hashtable, int *status_hashtable)
-{
-	int i = 0;
-	while (i != TABLESIZE)
-	{
-		int index = doublehash(pkeydata[pk_param], i);
-		if (status_hashtable[index] == 0)
-		{
-			hashtable[index] = pkeydata[pk_param];
-			status_hashtable[index] = 1;
-			break;
-		}
-		i++;
-	}
-}
-
-void * build_process_thread(void *p)
+void * probe_process_thread(void *p)
 {
 	thread_param_t data = *(thread_param_t *)p;
 	int j;
 	for (j = data.begin; j < data.end; j++)
-		build_process(data.zone_id, j, data.keydata, data.hashtable, data.status_hashtable);
+		probe_process(data.zone_id, j, data.keydata, data.hashtable, data.status_hashtable);
 
 	pthread_exit(NULL);
 	return NULL;
 }
 
-void buildhash_with_zone(int *pkeydata, int *hashtable[ZONENUM], int *hisgram)
+int probe_process(int hb_param, int fk_param, int *fkeydata, int *hashtable, int *status_hashtable)
+{
+	int i = 0;
+	int index;
+	while (i != TABLESIZE)
+	{
+		index = doublehash(fkeydata[fk_param], i);
+		if (status_hashtable[index] == 0)
+		{
+			status_hashtable[index] = 1;
+			break;
+		}
+		else if (fkeydata[fk_param] == hashtable[index])
+			break;
+		else
+			i++;
+	}
+	return index;
+}
+
+void probe_with_zone(int *hashtable[ZONENUM], int *fkeydata, int *hisgram)
 {
 	pthread_t threads[ZONENUM];
 	pthread_attr_t attr;
@@ -69,19 +58,18 @@ void buildhash_with_zone(int *pkeydata, int *hashtable[ZONENUM], int *hisgram)
 
 	int begin = 0;
 	int end;
-	//#pragma offload target(mic) in(hisgram:length(ZONENUM))
 	for (i = 0; i < ZONENUM; i++)
 	{
 		end = hisgram[i];
 
-		data[i].zone_id = i;
 		data[i].begin = begin;
 		data[i].end = end;
 		data[i].hashtable = hashtable[i];
-		data[i].keydata = pkeydata;
+		data[i].keydata = fkeydata;
 		data[i].status_hashtable = status_hashtable[i];
+		data[i].zone_id = i;
 
-		rc = pthread_create(&threads[i], &attr, build_process_thread, (void*)&data[i]);
+		rc = pthread_create(&threads[i], &attr, probe_process_thread, (void*)&data[i]);
 		assert(!rc);
 
 		begin = end;
@@ -94,7 +82,5 @@ void buildhash_with_zone(int *pkeydata, int *hashtable[ZONENUM], int *hisgram)
 	}
 
 	for (i = 0; i < ZONENUM; i++)
-	{
 		free(status_hashtable[i]);
-	}
 }

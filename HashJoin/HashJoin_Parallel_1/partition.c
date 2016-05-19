@@ -16,11 +16,11 @@ void hash_partition(int *ary, int size, int *keyzonenum, int *hisgram)
 void init(int *keyzonenum, int size, int *ary)
 {
 	int i;
+#pragma omp parallel for
 	for (i = 0; i < size; ++i)
 		keyzonenum[i] = ary[i] % ZONENUM;
 }
 
-// ¿ÉÒÔÓÃpthread
 void scan1(int *keyzonenum, int *hisgram, int size)
 {
 	int i;

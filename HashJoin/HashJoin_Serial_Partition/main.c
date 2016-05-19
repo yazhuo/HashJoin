@@ -49,11 +49,13 @@ int main(int argc, char **argv)
 	printf("foreign data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
 	int *hashtable[ZONENUM];
+	int *real_mem = (int *)malloc(sizeof(int) * ZONENUM * TABLESIZE);
+	assert(real_mem);
 	for (i = 0; i < ZONENUM; i++)
 	{
-		hashtable[i] = (int*)malloc(sizeof(int) * TABLESIZE);
-		assert(hashtable[i]);
-		memset(hashtable[i], 0, TABLESIZE * sizeof(int));
+		hashtable[i] = real_mem + i * TABLESIZE;//(int*)malloc(sizeof(int) * TABLESIZE);
+		//assert(hashtable[i]);
+		//memset(hashtable[i], 0, TABLESIZE * sizeof(int));
 	}
 
 	printf("begin building hashtable...\n");

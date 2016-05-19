@@ -44,7 +44,7 @@ void *sub_zonebegin_thread(void *p)
 	(zonesbegin.zones[ZONENUM - 1]).zonebegin[zonenum] = zonesbegin.global_zone_end - (zonesbegin.zones[ZONENUM - 1]).hisgram[ZONENUM - 1];
 	for (i = ZONENUM - 2; i >= 0; i--)
 	{
-		(zonesbegin.zones[i]).zonebegin[zonenum] = (zonesbegin.zones[i + 1]).zonebegin[zonenum] - (zonesbegin.zones[i]).hisgram[zonenum];
+		(zonesbegin.zones[i]).zonebegin[zonenum] = (zonesbegin.zones[i+1]).zonebegin[zonenum] - (zonesbegin.zones[i]).hisgram[zonenum];
 	}
 
 	pthread_exit(NULL);
@@ -140,14 +140,14 @@ void sub_zonebegin(int *zone_end, int *subzonebegin[ZONENUM], int *subhisgram[ZO
 
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
+	
 	for (i = 0; i < ZONENUM; i++)
 	{
 		zonesbegin[i].global_zone_end = zone_end[i];
 		zonesbegin[i].zones = zones;
-		(zonesbegin[i].zones[i]).zonebegin = subzonebegin[i];
+		(zonesbegin[i].zones[i]).zonebegin = subzonebegin[i];	
 		zonesbegin[i].zonenum = i;
-
+		
 		rc = pthread_create(&threads[i], &attr, sub_zonebegin_thread, (void*)&zonesbegin[i]);
 		assert(!rc);
 	}
@@ -169,7 +169,7 @@ void zone_keydata(int *keydata, int keylen, int *subzonebegin[ZONENUM], int *zon
 
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
+	
 
 	int zonesize = keylen / ZONENUM;
 	for (i = 0; i < ZONENUM; i++)
@@ -190,7 +190,7 @@ void zone_keydata(int *keydata, int keylen, int *subzonebegin[ZONENUM], int *zon
 	}
 }
 
-void cpu_parallel_partition(int *keydata, int keylen, int *hisgram, int *zone_end, int *zonekey)
+void parallel_partition(int *keydata, int keylen, int *hisgram, int *zone_end, int *zonekey)
 {
 	int i, j;
 	thread_subhisgram_t zones[ZONENUM];
@@ -209,20 +209,41 @@ void cpu_parallel_partition(int *keydata, int keylen, int *hisgram, int *zone_en
 		assert(subzonebegin[i]);
 		memset(subzonebegin[i], 0, sizeof(int) * ZONENUM);
 	}
+/****************************************************************************************/
+	sub_hisgram(keydata, keylen, subhisgram, zones,subzonebegin);
 
-	sub_hisgram(keydata, keylen, subhisgram, zones, subzonebegin);
+	//测试线程执行情况
+	for (i = 0; i < ZONENUM; i++)
+		for (j = 0; j < ZONENUM; j++)
+			printf("zones[%d].hisgram[%d] = %d\n", i, j, zones[i].hisgram[j]);
 
+/****************************************************************************************/
 	global_hisgram(keydata, hisgram, subhisgram, zones);
 
+	//测试全局直方图
+	for (i = 0; i < ZONENUM; i++)
+		printf("hisgram[%d] = %d\n", i, hisgram[i]);
+
+/****************************************************************************************/
+	//全局编址
 	int sum = 0;
 	for (i = 0; i < ZONENUM; i++)
 	{
 		sum += hisgram[i];
 		zone_end[i] = sum;
 	}
+	for (i = 0; i < ZONENUM; i++)
+		printf("zone_end[%d] = %d\n", i, zone_end[i]);
 
+	
+
+/****************************************************************************************/
 	sub_zonebegin(zone_end, subzonebegin, subhisgram, zones);
+	for (i = 0; i < ZONENUM; i++)
+		for (j = 0; j < ZONENUM; j++)
+			printf("zones[%d].begin[%d] = %d\n", i, j, subzonebegin[i][j]);
 
+/****************************************************************************************/
 	zone_keydata(keydata, keylen, subzonebegin, zonekey);
 
 	for (i = 0; i < ZONENUM; i++)

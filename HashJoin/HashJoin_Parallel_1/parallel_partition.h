@@ -3,7 +3,6 @@
 
 #include "global.h"
 
-#pragma offload_attribute(push, target(mic))
 void * sub_hisgram_thread(void *p);
 void * global_hisgram_thread(void *p);
 void *sub_zonebegin_thread(void *p);
@@ -12,7 +11,6 @@ void sub_hisgram(int *keydata, int keylen, int *subhisgram[ZONENUM], thread_subh
 void global_hisgram(int *keydata, int *hisgram, int *subhisgram[ZONENUM], thread_subhisgram_t *zones);
 void sub_zonebegin(int *zone_end, int *subzonebegin[ZONENUM], int *subhisgram[ZONENUM], thread_subhisgram_t *zones);
 void zone_keydata(int *keydata, int keylen, int *subzonebegin[ZONENUM], int *zonekey);
-void parallel_partition(int *keydata, int keylen, int *hisgram, int *zone_end, int *zonekey);
-#pragma offload_attribute(pop)
+void parallel_partition(int *keydata, int keylen, int *hisgram, int *zone_begin, int *zonekey);
 
 #endif

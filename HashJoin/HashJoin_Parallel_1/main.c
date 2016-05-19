@@ -8,9 +8,10 @@
 #include <assert.h>
 #include "global.h"
 #include "loader.h"
-#include "partition.h"
-#include "build.h"
-#include "probe.h"
+#include "parallel_partition.h"
+//#include "partition.h"
+//#include "build.h"
+//#include "probe.h"
 
 int main(int argc, char **argv)
 {
@@ -27,6 +28,49 @@ int main(int argc, char **argv)
 		11,12,13,14,15,16,17,18,19,20 };
 	int fkeylen = sizeof(fkeydata) / sizeof(int);
 
+	int *p_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
+	assert(p_hisgram);
+	memset(p_hisgram, 0, sizeof(int) * ZONENUM);
+	int *p_zone_end = (int*)malloc(sizeof(int) * ZONENUM);
+	assert(p_zone_end);
+	memset(p_zone_end, 0, sizeof(int) * ZONENUM);
+
+	int *pzonekey = malloc(sizeof(int) * 20);
+	assert(pzonekey);
+	memset(pzonekey, 0, sizeof(int) * 20);
+
+	parallel_partition(pkeydata, pkeylen, p_hisgram, p_zone_end, pzonekey);
+
+	for (i = 0; i < pkeylen; i++)
+		printf("%d ", pzonekey[i]);
+
+	//int *p_hisgram[ZONENUM];
+	//int *f_hisgram[ZONENUM];
+	//for (i = 0; i < ZONENUM; i++)
+	//{
+	//	p_hisgram[i] = (int*)malloc(sizeof(int) * ZONENUM);
+	//	assert(p_hisgram);
+	//	memset(p_hisgram[i], 0, sizeof(int) * ZONENUM);
+
+	//	f_hisgram[i] = (int*)malloc(sizeof(int) * ZONENUM);
+	//	assert(f_hisgram);
+	//	memset(f_hisgram[i], 0, sizeof(int) * ZONENUM);
+	//}
+
+	//parallel_partition(pkeydata, pkeylen, p_hisgram);
+
+	//for (i = 0; i < ZONENUM; i++)
+	//{
+	//	free(p_hisgram[i]);
+	//	free(f_hisgram[i]);
+	//}
+
+	free(p_hisgram);
+	free(p_zone_end);
+	free(pzonekey);
+	printf("ending...\n");
+	return 0;
+
 	//int pkeylen = datalen[0];
 	//int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	//assert(pkeydata != NULL);
@@ -40,67 +84,67 @@ int main(int argc, char **argv)
 	//loaddata(filenames, 3, fkeylen, fkeydata);
 	//printf("pkeylen = %d pkeydata[0] = %d \n", pkeylen, pkeydata[0]);
 
-	int *p_keyzonenum = (int*)malloc(sizeof(int) * pkeylen);
-	assert(p_keyzonenum);
-	int *p_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
-	assert(p_hisgram);
-	memset(p_hisgram, 0, sizeof(int) * ZONENUM);
-	int *f_keyzonenum = (int*)malloc(sizeof(int) * fkeylen);
-	assert(f_keyzonenum);
-	int *f_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
-	assert(f_hisgram);
-	memset(f_hisgram, 0, sizeof(int) * ZONENUM);
+	//int *p_keyzonenum = (int*)malloc(sizeof(int) * pkeylen);
+	//assert(p_keyzonenum);
+	//int *p_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
+	//assert(p_hisgram);
+	//memset(p_hisgram, 0, sizeof(int) * ZONENUM);
+	//int *f_keyzonenum = (int*)malloc(sizeof(int) * fkeylen);
+	//assert(f_keyzonenum);
+	//int *f_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
+	//assert(f_hisgram);
+	//memset(f_hisgram, 0, sizeof(int) * ZONENUM);
 
-	printf("begin hash partition...\n");
-	t1 = clock();
-	hash_partition(pkeydata, pkeylen, p_keyzonenum, p_hisgram);
-	t2 = clock();
-	printf("private data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
+	//printf("begin hash partition...\n");
+	//t1 = clock();
+	//hash_partition(pkeydata, pkeylen, p_keyzonenum, p_hisgram);
+	//t2 = clock();
+	//printf("private data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
-	t1 = clock();
-	hash_partition(fkeydata, fkeylen, f_keyzonenum, f_hisgram);
-	t2 = clock();
-	printf("foreign data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
+	//t1 = clock();
+	//hash_partition(fkeydata, fkeylen, f_keyzonenum, f_hisgram);
+	//t2 = clock();
+	//printf("foreign data partition time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
-	/* malloc for build process */
-	int *hashtable[ZONENUM];
-	for (i = 0; i < ZONENUM; i++)
-	{
-		hashtable[i] = (int*)malloc(sizeof(int) * TABLESIZE);
-		assert(hashtable[i]);
-		memset(hashtable[i], 0, TABLESIZE * sizeof(int));
-	}
+	///* malloc for build process */
+	//int *hashtable[ZONENUM];
+	//for (i = 0; i < ZONENUM; i++)
+	//{
+	//	hashtable[i] = (int*)malloc(sizeof(int) * TABLESIZE);
+	//	assert(hashtable[i]);
+	//	memset(hashtable[i], 0, TABLESIZE * sizeof(int));
+	//}
 
-	printf("begin building hashtable...\n");
-	t1 = clock();
-	buildhash_with_zone(pkeydata, hashtable, p_hisgram);
-	t2 = clock();
-	printf("build hashtable time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
+	//printf("begin building hashtable...\n");
+	//t1 = clock();
+	//buildhash_with_zone(pkeydata, hashtable, p_hisgram);
+	//t2 = clock();
+	//printf("build hashtable time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
-	int j;
-	printf("hashtable: \n");
-	for (i = 0; i < ZONENUM; i++)
-	{
-		printf("hashtable[%d]:\n", i);
-		for (j = 0; j < TABLESIZE; j++)
-		{
-			printf("%d ", hashtable[i][j]);
-		}
-		printf("\n");
-	}
+	//int j;
+	//printf("hashtable: \n");
+	//for (i = 0; i < ZONENUM; i++)
+	//{
+	//	printf("hashtable[%d]:\n", i);
+	//	for (j = 0; j < TABLESIZE; j++)
+	//	{
+	//		printf("%d ", hashtable[i][j]);
+	//	}
+	//	printf("\n");
+	//}
 
-	printf("begin probe...\n");
-	t1 = clock();
-	probe_with_zone(hashtable, fkeydata, f_hisgram);
-	t2 = clock();
-	printf("probe time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
+	//printf("begin probe...\n");
+	//t1 = clock();
+	//probe_with_zone(hashtable, fkeydata, f_hisgram);
+	//t2 = clock();
+	//printf("probe time = %f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 
-	for (i = 0; i < ZONENUM; i++)
-		free(hashtable[i]);
-	free(p_keyzonenum);
-	free(p_hisgram);
-	free(f_keyzonenum);
-	free(f_hisgram);
+	//for (i = 0; i < ZONENUM; i++)
+	//	free(hashtable[i]);
+	//free(p_keyzonenum);
+	//free(p_hisgram);
+	//free(f_keyzonenum);
+	//free(f_hisgram);
 //	free(pkeydata);
 //	free(fkeydata);
 

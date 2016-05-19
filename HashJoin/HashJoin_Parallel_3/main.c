@@ -19,6 +19,15 @@ int main(int argc, char **argv)
 	struct timeval start, end;
 	long cost_time = 0;
 
+	//int pkeydata[] = { 1,2,3,4,5,6,7,8,9,10,
+	//	11,12,13,14,15,16,17,18,19,20 };
+	//int pkeylen = sizeof(pkeydata) / sizeof(int);
+	//int fkeydata[] = { 1,2,3,4,5,6,7,8,9,10,
+	//	1,2,3,4,5,6,7,8,9,10,
+	//	11,12,13,14,15,16,17,18,19,20,
+	//	11,12,13,14,15,16,17,18,19,20 };
+	//int fkeylen = sizeof(fkeydata) / sizeof(int);
+
 	int pkeylen = datalen[0];
 	int *pkeydata = (int*)malloc(sizeof(int) * pkeylen);
 	assert(pkeydata != NULL);
@@ -37,47 +46,32 @@ int main(int argc, char **argv)
 	int *p_zone_end = (int*)malloc(sizeof(int) * ZONENUM);
 	assert(p_zone_end);
 	memset(p_zone_end, 0, sizeof(int) * ZONENUM);
-	int *p_zonekey = malloc(sizeof(int) * pkeylen);
-	assert(p_zonekey);
-	memset(p_zonekey, 0, sizeof(int) * pkeylen);
-
-	printf("begin malloc on MIC...\n");
-#pragma offload_transfer target(mic) in(p_hisgram:length(ZONENUM), p_zone_end:length(ZONENUM) alloc_if(1) free_if(0) )\
-inout(p_zonekey:length(pkeylen) alloc_if(1) free_if(0)) 
-	{}
-	printf("begin partition on MIC...\n");
-#pragma offload target(mic) in(pkeydata : length(pkeylen))
-	{
-#ifdef __MIC__
-		struct timeval t1, t2;
-		long cost_time = 0;
-		gettimeofday(&t1, NULL);
-		parallel_partition(pkeydata, pkeylen, p_hisgram, p_zone_end, p_zonekey);
-		gettimeofday(&t2, NULL);
-		cost_time = (t2.tv_sec - t1.tv_sec) * 1000 + (t2.tv_usec - t1.tv_usec) / 1000;
-		printf("S partition on MIC time = %d\n", cost_time);
-
-#else
-		printf("fail to run on mic \n\n");
-#endif
-	}
-
 	int *f_hisgram = (int*)malloc(sizeof(int) * ZONENUM);
 	assert(f_hisgram);
 	memset(f_hisgram, 0, sizeof(int) * ZONENUM);
 	int *f_zone_end = (int*)malloc(sizeof(int) * ZONENUM);
 	assert(f_zone_end);
 	memset(f_zone_end, 0, sizeof(int) * ZONENUM);
+
+	int *p_zonekey = malloc(sizeof(int) * pkeylen);
+	assert(p_zonekey);
+	memset(p_zonekey, 0, sizeof(int) * pkeylen);
 	int *f_zonekey = malloc(sizeof(int) * fkeylen);
 	assert(f_zonekey);
 	memset(f_zonekey, 0, sizeof(int) * fkeylen);
 
-	printf("begin partition on CPU...\n");
+	printf("begin hash partition...\n");
+	gettimeofday(&start, NULL);
+	parallel_partition(pkeydata, pkeylen, p_hisgram, p_zone_end, p_zonekey);
+	gettimeofday(&end, NULL);
+	cost_time = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
+	printf("private data partition time = %d\n", cost_time);
+
 	gettimeofday(&start, NULL);
 	parallel_partition(fkeydata, fkeylen, f_hisgram, f_zone_end, f_zonekey);
 	gettimeofday(&end, NULL);
 	cost_time = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
-	printf("R partition time on CPU = %d\n", cost_time);
+	printf("foreign data partition time = %d\n", cost_time);
 
 	int *hashtable[ZONENUM];
 	for (i = 0; i < ZONENUM; i++)
@@ -109,7 +103,7 @@ inout(p_zonekey:length(pkeylen) alloc_if(1) free_if(0))
 	free(p_zone_end);
 	free(f_zone_end);
 	free(p_zonekey);
-	//free(f_zonekey);
+	free(f_zonekey);
 	free(pkeydata);
 	free(fkeydata);
 

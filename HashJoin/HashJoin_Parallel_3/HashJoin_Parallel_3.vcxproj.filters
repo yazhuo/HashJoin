@@ -15,26 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="global.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="partition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="probe.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parallel_partition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="global.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -50,11 +33,22 @@
     <ClCompile Include="probe.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="parallel_partition.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="partition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="build.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="probe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
